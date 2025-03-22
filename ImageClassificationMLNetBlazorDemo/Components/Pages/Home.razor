@@ -1,7 +1,91 @@
 ﻿@page "/"
+@using static BlazorImageClassificationMLNetDemo.HorseOrMooseImageClassifier
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Horse or Moose detection</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Horse or Moose detection</h1>
 
-Welcome to your new app.
+<img src="horseormoose.png" />
+
+<p>
+    Upload an image and let the <em><b>ML.NET</b> Machine Learning</em> model trained used for this DEMO decide
+    whether the image is showing<b>Horse</b> or a <b>Moose</b>, or something else! 
+</p>
+
+<InputFile OnChange="LoadFileAsync" class="form-control" />
+
+@if (_base64ImageSource is not null){
+
+    @if(_errorMessage is null){
+        <h2>Classification</h2>
+        <p>@_predictedLabel</p>
+        <b>Confidence scores</b>
+        @if (_predictedLabels != null){
+            <ul>
+                @foreach (var score in _predictedLabels){
+                    <li><span>@score.Key</span> <span>@score.Value</span></li>
+                }
+
+            </ul>
+        }
+        <img src="@_base64ImageSource" title="Loaded image" class="img-thumbnail" />
+    }
+    else {
+        <div class="alert-danger">@_errorMessage</div>
+    }
+}
+
+@code {
+
+    private string? _base64ImageSource = null;
+    private string? _predictedLabel = "No classification";
+    private IOrderedEnumerable<KeyValuePair<string, float>>? _predictedLabels = null;
+    private string? _errorMessage = null;
+
+    private async Task LoadFileAsync(InputFileChangeEventArgs e)
+    {
+        try {
+
+            if (e.File.Size <= 0 || e.File.Size >= 2*1024*1024){
+                _errorMessage = "Sorry, the uploaded image but be between 1 byte and 2 MB!";
+                return;
+            }
+
+            byte[] imageBytes = await GetImageBytes(e.File);
+            _base64ImageSource = GetBase64ImageSourceString(e.File.ContentType, imageBytes);  
+
+            PredictImageClassification(imageBytes);
+           
+        }
+        catch (Exception err){
+            Console.WriteLine(err);
+            _base64ImageSource = null;
+        }
+    }
+
+    private void PredictImageClassification(byte[] imageBytes){
+
+        var input = new ModelInput{
+            ImageSource = imageBytes
+        };
+        ModelOutput output = HorseOrMooseImageClassifier.Predict(input);
+        _predictedLabel = output.PredictedLabel;
+
+        _predictedLabels = HorseOrMooseImageClassifier.PredictAllLabels(input);
+    }
+
+
+    private async Task<byte[]> GetImageBytes(IBrowserFile file){
+        using MemoryStream memoryStream = new();
+        var stream = file.OpenReadStream(2*1024*1024, CancellationToken.None);
+        await stream.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
+    }
+
+    private string GetBase64ImageSourceString(string contentType, byte[] bytes){
+        string preAmble = $"data:{contentType};base64,";
+        return $"{preAmble}{(Convert.ToBase64String(bytes))}";
+    }
+
+
+}
