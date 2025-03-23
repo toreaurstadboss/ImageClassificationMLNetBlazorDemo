@@ -1,21 +1,16 @@
-﻿@inherits LayoutComponentBase
+﻿@* MainLayout.razor *@
+@inherits LayoutComponentBase
 
-@* MainLayout.razor *@
-
-<div class="container">
+<div class="d-flex">
     <NavMenu />
-    <div class="content">
+    <div class="content flex-grow-1">
         @Body
     </div>
 </div>
 
 <style>
     .content {
-        margin-top: 20px;
+        margin-left: 250px; /* Same width as the sidebar */
+        padding: 20px;
     }
 </style>
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
