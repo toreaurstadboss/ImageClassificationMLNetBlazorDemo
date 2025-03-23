@@ -20,24 +20,22 @@
                 whether the image is showing a <b>Horse</b> or a <b>Moose</b>, or something else!
                 Only Horses or Mooses will be detected in this demo.
             </p>
-        </div> 
+        </div>
     </div>
 
-    <div class="row">
+    @if (_base64ImageSource is not null)
+    {
 
-
-        @if (_base64ImageSource is not null)
+        @if (_errorMessage is null)
         {
+            <div class="row">
+                <div class="col-md-8">
 
-            @if (_errorMessage is null)
-            {
-                <div class="col-md-4">
+                    <h5>Classification of object or objects in the loaded image</h5>
 
-                    <h2>Classification of object or objects in the loaded image</h2>
-
-                    <div class="card col-md-6">
+                    <div class="card col-md-12">
                         <div class="card-body">
-                            <h5 class="card-title">Prediction of object</h5>
+                            <h2 class="card-title">Prediction of object</h2>
                             <h6 class="card-subtitle">The machine learning model predicted the following:</h6>
                             <h4 class="card-text text-success text-uppercase">@_predictedLabel</h4>
                         </div>
@@ -47,35 +45,43 @@
 
                 <div class="col-md-4">
 
-                    <b>Confidence scores</b>
                     @if (_predictedLabels != null)
                     {
-                        <ul>
-                            @foreach (var score in _predictedLabels)
-                            {
-                                var scorePercentage = 100 * score.Value;
-                                <li><span>@score.Key</span> <span>@scorePercentage.ToString("F1") %</span></li>
-                            }
+                        <br />
+                        <div class="card">
+                            <div class="card-body">
+                            <h4 class="card-title">Confidence scores</h4>
 
-                        </ul>
+                                <ul>
+                                    @foreach (var score in _predictedLabels)
+                                    {
+                                        var scorePercentage = 100 * score.Value;
+                                        <li><span>@score.Key</span> <span>@scorePercentage.ToString("F1") %</span></li>
+                                    }
+
+                                </ul>
+
+                            </div>
+                        </div>
                     }
 
                 </div>
-            }
-            else
-            {
-                <div class="alert-danger">@_errorMessage</div>
-            }
+            </div>
         }
-
-    </div>
+        else
+        {
+            <div class="alert-danger">@_errorMessage</div>
+        }
+    }
 
     <div class="row">
         @if (_base64ImageSource is not null)
         {
-            <div class="col-md-4">
-                <h6>Loaded image</h6>
-                <img src="@_base64ImageSource" title="Loaded image" class="img-thumbnail" />
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>Loaded image</h6>
+                    <img src="@_base64ImageSource" title="Loaded image" class="img-thumbnail" />
+                </div>
             </div>
         }
 
@@ -141,6 +147,4 @@
         string preAmble = $"data:{contentType};base64,";
         return $"{preAmble}{(Convert.ToBase64String(bytes))}";
     }
-
-
-    }
+}

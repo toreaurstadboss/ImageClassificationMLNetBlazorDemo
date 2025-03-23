@@ -1,5 +1,9 @@
 ﻿@* NavMenu.razor *@
 <div class="sidebar">
+    <div class="navbar-brand bg-black text-white rounded-3 p-2">
+        Image Classification<br />
+        ML.NET Demo in Blazor
+    </div>
     <nav class="nav flex-column">
         <a class="nav-link active" href="/">Home</a>
         <a class="nav-link" href="https://toreaurstad.blogspot.com" target="_blank">Author's blog</a>
@@ -18,10 +22,12 @@
         background: linear-gradient(180deg, #007bff, #050505); /* Gradient from blue to purple */
         color: white;
     }
+
     .nav-link {
         color: white;
     }
-    .nav-link.active {
-        font-weight: bold;
-    }
+
+        .nav-link.active {
+            font-weight: bold;
+        }
 </style>
